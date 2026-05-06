@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Utc};
 
 #[derive(Debug, Deserialize)]
 pub struct FraudScoreRequest {
@@ -7,14 +8,14 @@ pub struct FraudScoreRequest {
     pub customer: Customer,
     pub merchant: Merchant,
     pub terminal: Terminal,
-    pub last_transaction: LastTransaction,
+    pub last_transaction: Option<LastTransaction>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Transaction {
     pub amount: f64,
     pub installments: u32,
-    pub requested_at: String,
+    pub requested_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,7 +41,7 @@ pub struct Terminal {
 
 #[derive(Debug, Deserialize)]
 pub struct LastTransaction {
-    pub timestamp: String,
+    pub timestamp: DateTime<Utc>,
     pub km_from_current: f64,
 }
 
