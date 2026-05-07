@@ -1,14 +1,6 @@
 use std::fs;
 
-use serde::Deserialize;
-
-use crate::models::vector::{Label, VectorData, VECTOR_DIM};
-
-#[derive(Deserialize)]
-struct JsonVectorData {
-    vector: Vec<f64>,
-    label: String,
-}
+use crate::models::vector::{Label, JsonVectorData, VectorData, VECTOR_DIM};
 
 pub struct FraudRepository {
     data: Vec<VectorData>,
