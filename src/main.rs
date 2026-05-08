@@ -26,8 +26,8 @@ async fn main() -> std::io::Result<()> {
         .unwrap_or_else(|_| "data/references.bin".to_string());
 
     let repo = FraudRepository::new(&references_path);
-    let hnsw = kdtree::KDTree::new(repo);
-    let fraud_service = web::Data::new(FraudService::new(hnsw));
+    let kdtree = kdtree::KdTree::new(repo);
+    let fraud_service = web::Data::new(FraudService::new(kdtree));
 
     HttpServer::new(move || {
         App::new()

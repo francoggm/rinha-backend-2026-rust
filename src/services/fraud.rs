@@ -1,25 +1,23 @@
 use std::collections::HashMap;
 
-use crate::knn::kdtree::KDTree;
-use crate::models::fraud::FraudScoreRequest;
+use crate::knn::kdtree::KdTree;
+use crate::models::fraud::{FraudScoreRequest, FraudScoreResponse};
 use crate::services::normalizer;
 
 pub struct FraudService {
-    kdtree: KDTree,
-    mcc_risk: HashMap<String, f64>,
-    max_amount: f64,
-    max_installments: f64,
-    amount_vs_avg_ratio: f64,
-    max_minutes: f64,
-    max_km: f64,
-    max_tx_count_24h: f64,
-    max_merchant_avg_amount: f64,
+    kdtree: KdTree,
+    mcc_risk: HashMap<String, f32>,
+    max_amount: f32,
+    max_installments: f32,
+    amount_vs_avg_ratio: f32,
+    max_minutes: f32,
+    max_km: f32,
+    max_tx_count_24h: f32,
+    max_merchant_avg_amount: f32,
 }
 
 impl FraudService {
-    pub fn new(
-        kdtree: KDTree,
-    ) -> Self {
+    pub fn new(kdtree: KdTree) -> Self {
         Self {
             kdtree,
             mcc_risk: HashMap::from([
@@ -44,7 +42,7 @@ impl FraudService {
         }
     }
 
-    pub fn calculate_fraud_score(&self, fraud_request: &FraudScoreRequest) -> String {
+    pub fn calculate_fraud_score(&self, fraud_request: &FraudScoreRequest) -> FraudScoreResponse {
         let vector = [
             normalizer::normalize_amount(self.max_amount, fraud_request.transaction.amount),
             normalizer::normalize_installments(self.max_installments, fraud_request.transaction.installments),
@@ -61,15 +59,12 @@ impl FraudService {
             normalizer::normalize_mcc_risk(&self.mcc_risk, &fraud_request.merchant),
             normalizer::normalize_merchant_avg_amount(self.max_merchant_avg_amount, fraud_request.merchant.avg_amount),
         ];
-        
-        vector.iter().map(|v| {
-            let rounded = (*v * 10000.0).round() / 10000.0;
-            if rounded == rounded.trunc() {
-                format!("{}", rounded as i64)
-            } else {
-                let s = format!("{:.4}", rounded);
-                s.trim_end_matches('0').to_string()
-            }
-        }).collect::<Vec<_>>().join(",")
+
+        let fraud_score = self.kdtree.knn(&vector);
+
+        FraudScoreResponse {
+            approved: fraud_score < 0.5,
+            fraud_score,
+        }
     }
 }

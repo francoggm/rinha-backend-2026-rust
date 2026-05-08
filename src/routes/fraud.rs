@@ -1,6 +1,6 @@
 use actix_web::{post, web, HttpResponse};
 
-use crate::models::fraud::{FraudScoreRequest, FraudScoreResponse};
+use crate::models::fraud::FraudScoreRequest;
 use crate::services::fraud::FraudService;
 
 #[post("/fraud-score")]
