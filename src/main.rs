@@ -26,14 +26,6 @@ async fn main() -> std::io::Result<()> {
         .unwrap_or_else(|_| "data/references.bin".to_string());
 
     let repo = FraudRepository::new(&references_path);
-
-    log::info!("Verifying first vectors from binary file:");
-    for i in 0..5 {
-        let vec = repo.get_vector(i);
-        let label = repo.get_label(i);
-        log::info!("  [{}] label={:?} vec={:?}", i, label, vec);
-    }
-
     let hnsw = kdtree::KDTree::new(repo);
     let fraud_service = web::Data::new(FraudService::new(hnsw));
 
