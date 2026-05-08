@@ -1,12 +1,12 @@
 use crate::repositories::fraud::FraudRepository;
 
-pub struct HNSW {
+pub struct KDTree {
     repository: FraudRepository,
 }
 
-impl HNSW {
+impl KDTree {
     pub fn new(repository: FraudRepository) -> Self {
-        HNSW {
+        KDTree {
             repository,
         }
     }

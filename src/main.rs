@@ -9,7 +9,7 @@ use std::env;
 
 use repositories::fraud::FraudRepository;
 use services::fraud::FraudService;
-use knn::hnsw;
+use knn::kdtree;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -23,11 +23,18 @@ async fn main() -> std::io::Result<()> {
     log::info!("Starting server on port {}", port);
 
     let references_path = env::var("REFERENCES_FILE")
-        .unwrap_or_else(|_| "data/references.json".to_string());
+        .unwrap_or_else(|_| "data/references.bin".to_string());
 
-    let hnsw = hnsw::HNSW::new(
-        FraudRepository::new(&references_path),
-    );
+    let repo = FraudRepository::new(&references_path);
+
+    log::info!("Verifying first vectors from binary file:");
+    for i in 0..5 {
+        let vec = repo.get_vector(i);
+        let label = repo.get_label(i);
+        log::info!("  [{}] label={:?} vec={:?}", i, label, vec);
+    }
+
+    let hnsw = kdtree::KDTree::new(repo);
     let fraud_service = web::Data::new(FraudService::new(hnsw));
 
     HttpServer::new(move || {

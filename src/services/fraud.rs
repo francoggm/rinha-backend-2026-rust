@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use crate::knn::hnsw::HNSW;
+use crate::knn::kdtree::KDTree;
 use crate::models::fraud::FraudScoreRequest;
 use crate::services::normalizer;
 
 pub struct FraudService {
-    hnsw: HNSW,
+    kdtree: KDTree,
     mcc_risk: HashMap<String, f64>,
     max_amount: f64,
     max_installments: f64,
@@ -18,10 +18,10 @@ pub struct FraudService {
 
 impl FraudService {
     pub fn new(
-        hnsw: HNSW,
+        kdtree: KDTree,
     ) -> Self {
         Self {
-            hnsw,
+            kdtree,
             mcc_risk: HashMap::from([
                 ("5411".to_string(), 0.15),
                 ("5812".to_string(), 0.30),
